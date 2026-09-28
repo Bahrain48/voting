@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sesi Voting Dikunci - E-Voting OSIS & MPK</title>
+  <link rel="stylesheet" href="/css/tailwind.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#fef2f2,#fee2e2);padding:2rem;">
+  <div style="max-width:480px;width:100%;text-align:center;">
+    <div class="card" style="padding:3rem 2rem;border:2px solid var(--red-border);">
+      <div style="font-size:3rem;margin-bottom:1rem;">🔒</div>
+      <h1 style="font-size:1.3rem;font-weight:800;color:var(--red-text);margin-bottom:0.75rem;">Sesi Pemungutan Suara Dikunci</h1>
+      <p style="color:var(--text-muted);font-size:0.87rem;margin-bottom:1.5rem;">
+        Sesi pemungutan suara saat ini <strong>sedang ditutup</strong> oleh Admin / Pembina OSIS.<br>
+        Anda belum dapat memasuki bilik suara.
+      </p>
+      <div class="alert alert-error">
+        <span class="alert-icon">🔒</span>
+        <div>
+          <strong>Alasan:</strong><br>
+          <%= lockReason || 'Sesi pemungutan suara telah ditutup resmi.' %>
+        </div>
+      </div>
+      <% if (voter) { %>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin:1rem 0;">
+        Pemilih: <strong><%= voter.nama %></strong> (<%= voter.kelas %>)
+      </p>
+      <% } %>
+      <a href="/logout" class="btn btn-outline btn-full" style="margin-top:1rem;">Keluar dari Sistem</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

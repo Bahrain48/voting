@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>500 Server Error - E-Voting</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg-main);padding:2rem;">
+  <div style="max-width:440px;text-align:center;">
+    <div style="font-size:5rem;">💥</div>
+    <h1 style="font-size:3rem;font-weight:900;color:var(--red);">500</h1>
+    <h2 style="font-size:1.2rem;font-weight:700;color:var(--text-main);margin-bottom:0.75rem;">Terjadi Kesalahan Server</h2>
+    <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error" style="text-align:left;margin-bottom:1.5rem;">
+      <span class="alert-icon">💥</span><code><%= error %></code>
+    </div>
+    <% } %>
+    <a href="/" class="btn btn-primary">← Kembali ke Beranda</a>
+  </div>
+</div>
+</body>
+</html>

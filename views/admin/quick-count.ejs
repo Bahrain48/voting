@@ -1,0 +1,140 @@
+<%- include('../partials/head') %>
+<div class="layout-wrapper">
+  <%- include('../partials/sidebar', { currentPage: 'quick-count' }) %>
+  <div class="main-content">
+    <header class="main-header">
+      <div class="main-header-left">
+        <div>
+          <div class="page-title">📡 Quick Count Real-Time</div>
+          <div class="breadcrumb">Dashboard &rsaquo; Quick Count</div>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <div class="session-status <%= isVotingOpen ? 'open' : 'locked' %>">
+          <div class="session-dot <%= isVotingOpen ? 'open' : 'locked' %>"></div>
+          <%= isVotingOpen ? 'SESI AKTIF' : 'SESI DIKUNCI' %>
+        </div>
+        <span id="last-update" style="font-size:0.72rem;color:var(--text-muted);align-self:center;">Memuat...</span>
+      </div>
+    </header>
+    <main class="main-body">
+      <!-- Summary Stats -->
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat-card blue">
+          <div class="stat-card-icon">🗳️</div>
+          <div class="stat-value" id="total-suara"><%= totalSuara %></div>
+          <div class="stat-label">Total Suara Sah</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-card-icon">✅</div>
+          <div class="stat-value" id="has-voted"><%= hasVotedCount %></div>
+          <div class="stat-label">Pemilih Telah Mencoblos</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-card-icon">⏳</div>
+          <div class="stat-value" id="belum-pilih"><%= totalVoters - hasVotedCount %></div>
+          <div class="stat-label">Belum Mencoblos</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-card-icon">📈</div>
+          <div class="stat-value" id="partisipasi"><%= totalVoters > 0 ? Math.round((hasVotedCount / totalVoters) * 100) : 0 %>%</div>
+          <div class="stat-label">Partisipasi Suara</div>
+        </div>
+      </div>
+
+      <!-- Main Quick Count Cards -->
+      <div id="quick-count-container">
+        <div class="candidates-qc-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;margin-bottom:1.75rem;">
+          <% const qcColors = ['blue','green','purple','amber','red'];
+          const totalS = totalSuara;
+          candidates.forEach((c, i) => {
+            const pct = totalS > 0 ? ((c.suaraCount / totalS) * 100).toFixed(1) : 0;
+            const isLeading = candidates.every(x => x.id === c.id || x.suaraCount <= c.suaraCount);
+            const color = qcColors[i % qcColors.length];
+          %>
+          <div class="card" style="position:relative;overflow:hidden;" data-cid="<%= c.id %>">
+            <% if (isLeading && totalS > 0) { %>
+            <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--amber),var(--red))"></div>
+            <% } else { %>
+            <div style="position:absolute;top:0;left:0;right:0;height:4px;background:var(--<%= color %>)"></div>
+            <% } %>
+            <div class="card-body">
+              <div style="display:flex;gap:1rem;align-items:flex-start;">
+                <div style="width:56px;height:56px;border-radius:14px;background:var(--<%= color %>-bg);color:var(--<%= color %>);font-weight:900;font-size:1.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  0<%= c.nomorUrut %>
+                </div>
+                <div style="flex:1;">
+                  <div style="font-size:1rem;font-weight:800;color:var(--text-main)"><%= c.namaKetua %></div>
+                  <div style="font-size:0.8rem;color:var(--text-muted)">&amp; <%= c.namaWakil %></div>
+                  <% if (isLeading && totalS > 0) { %>
+                  <span class="badge badge-amber" style="margin-top:4px;">🏆 Unggul</span>
+                  <% } %>
+                </div>
+              </div>
+              <div style="margin-top:1.25rem;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;">
+                  <span style="font-size:0.75rem;color:var(--text-muted);font-weight:600;">Perolehan Suara</span>
+                  <span style="font-size:0.75rem;font-weight:700;color:var(--<%= color %>)" class="pct-val"><%= pct %>%</span>
+                </div>
+                <div class="progress-bar-wrapper" style="height:14px;">
+                  <div class="progress-bar <%= color %> suara-bar" style="width:<%= pct %>%" data-pct="<%= pct %>"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-top:0.6rem;">
+                  <div style="font-size:2rem;font-weight:900;color:var(--text-main)" class="vote-count"><%= c.suaraCount %></div>
+                  <div class="text-muted text-sm">dari <%= totalSuara %> suara sah</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body" style="text-align:center;color:var(--text-muted);font-size:0.8rem;">
+          🔄 Data diperbarui otomatis setiap <strong>5 detik</strong> &bull;
+          Data terakhir: <span id="last-time">-</span> &bull;
+          <% if (setting) { %>
+            Sesi: <strong><%= setting.sessionName %></strong>
+          <% } %>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+// Auto-refresh quick count setiap 5 detik
+async function refreshQuickCount() {
+  try {
+    const res = await fetch('/admin/api/quick-count');
+    const data = await res.json();
+    if (!data.success) return;
+
+    const total = data.totalSuara;
+    document.getElementById('total-suara').textContent = total;
+    document.getElementById('has-voted').textContent = data.hasVotedCount;
+    document.getElementById('belum-pilih').textContent = data.totalVoters - data.hasVotedCount;
+    const pct = data.totalVoters > 0 ? Math.round((data.hasVotedCount / data.totalVoters) * 100) : 0;
+    document.getElementById('partisipasi').textContent = pct + '%';
+
+    data.candidates.forEach(c => {
+      const card = document.querySelector(`[data-cid="${c.id}"]`);
+      if (!card) return;
+      const p = total > 0 ? ((c.suaraCount / total) * 100).toFixed(1) : 0;
+      const countEl = card.querySelector('.vote-count');
+      const barEl = card.querySelector('.suara-bar');
+      const pctEl = card.querySelector('.pct-val');
+      if (countEl) countEl.textContent = c.suaraCount;
+      if (barEl) barEl.style.width = p + '%';
+      if (pctEl) pctEl.textContent = p + '%';
+    });
+    document.getElementById('last-time').textContent = new Date().toLocaleTimeString('id-ID');
+    document.getElementById('last-update').textContent = 'Update: ' + new Date().toLocaleTimeString('id-ID');
+  } catch(e) { console.error('Quick count refresh error:', e); }
+}
+setInterval(refreshQuickCount, 5000);
+refreshQuickCount();
+</script>
+</body>
+</html>

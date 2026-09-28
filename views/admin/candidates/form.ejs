@@ -1,0 +1,73 @@
+<%- include('../../partials/head') %>
+<div class="layout-wrapper">
+  <%- include('../../partials/sidebar', { currentPage: 'candidates' }) %>
+  <div class="main-content">
+    <header class="main-header">
+      <div class="main-header-left">
+        <div>
+          <div class="page-title"><%= candidate ? '✏️ Edit Paslon' : '➕ Tambah Paslon' %></div>
+          <div class="breadcrumb">Paslon &rsaquo; <%= candidate ? 'Edit' : 'Tambah Baru' %></div>
+        </div>
+      </div>
+      <a href="/admin/candidates" class="btn btn-outline">← Kembali</a>
+    </header>
+    <main class="main-body">
+      <div class="card" style="max-width:700px;margin:0 auto;">
+        <div class="card-header">
+          <div class="card-title"><%= candidate ? '✏️ Edit Data Paslon' : '➕ Form Tambah Pasangan Calon' %></div>
+        </div>
+        <div class="card-body">
+          <% if (error) { %>
+          <div class="alert alert-error"><span class="alert-icon">⚠️</span> <%= error %></div>
+          <% } %>
+
+          <form action="/admin/candidates/<%= candidate ? candidate.id + '/edit' : 'add' %>" method="POST">
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label" for="nomorUrut">Nomor Urut *</label>
+                <input type="number" id="nomorUrut" name="nomorUrut" class="form-control"
+                  value="<%= candidate ? candidate.nomorUrut : '' %>" min="1" max="99" required placeholder="Contoh: 1">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="fotoUrl">URL Foto Paslon</label>
+                <input type="text" id="fotoUrl" name="fotoUrl" class="form-control"
+                  value="<%= candidate ? candidate.fotoUrl : '' %>" placeholder="/images/paslon1.svg">
+                <div class="form-hint">Kosongkan untuk gunakan gambar default (/images/paslon{N}.svg)</div>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label" for="namaKetua">Nama Calon Ketua OSIS *</label>
+                <input type="text" id="namaKetua" name="namaKetua" class="form-control"
+                  value="<%= candidate ? candidate.namaKetua : '' %>" required placeholder="Nama lengkap...">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="namaWakil">Nama Calon Wakil Ketua *</label>
+                <input type="text" id="namaWakil" name="namaWakil" class="form-control"
+                  value="<%= candidate ? candidate.namaWakil : '' %>" required placeholder="Nama lengkap...">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="visi">Visi Paslon *</label>
+              <textarea id="visi" name="visi" class="form-control" rows="3" required
+                placeholder="Tuliskan visi pasangan calon..."><%= candidate ? candidate.visi : '' %></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="misi">Misi Paslon *</label>
+              <textarea id="misi" name="misi" class="form-control" rows="5" required
+                placeholder="Tuliskan misi (bisa per poin: 1. ... 2. ...)"><%= candidate ? candidate.misi : '' %></textarea>
+            </div>
+            <div class="flex gap-3" style="margin-top:0.5rem;">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <%= candidate ? '💾 Simpan Perubahan' : '➕ Tambahkan Paslon' %>
+              </button>
+              <a href="/admin/candidates" class="btn btn-outline btn-lg">Batal</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

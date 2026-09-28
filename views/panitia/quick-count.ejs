@@ -1,0 +1,76 @@
+<%- include('../partials/head') %>
+<div class="layout-wrapper">
+  <%- include('../partials/sidebar', { currentPage: 'quick-count' }) %>
+  <div class="main-content">
+    <header class="main-header">
+      <div class="main-header-left">
+        <div>
+          <div class="page-title">📡 Monitoring Quick Count</div>
+          <div class="breadcrumb">Panitia TPS &rsaquo; Perolehan Suara Real-Time</div>
+        </div>
+      </div>
+      <span id="last-refresh" style="font-size:0.72rem;color:var(--text-muted);align-self:center;">Auto-refresh aktif...</span>
+    </header>
+    <main class="main-body">
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card blue"><div class="stat-value" id="t-suara"><%= totalSuara %></div><div class="stat-label">Total Suara Sah</div></div>
+        <div class="stat-card green"><div class="stat-value" id="t-voted"><%= hasVotedCount %></div><div class="stat-label">Sudah Memilih</div></div>
+        <div class="stat-card amber"><div class="stat-value" id="t-part"><%= totalVoters > 0 ? Math.round((hasVotedCount/totalVoters)*100) : 0 %>%</div><div class="stat-label">Partisipasi</div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;">
+        <% const colors2 = ['blue','green','purple']; candidates.forEach((c,i) => {
+          const p = totalSuara > 0 ? ((c.suaraCount/totalSuara)*100).toFixed(1) : 0;
+          const col = colors2[i%colors2.length];
+        %>
+        <div class="card" data-cid="<%= c.id %>">
+          <div class="card-body">
+            <div class="flex gap-3 mb-4">
+              <div style="width:50px;height:50px;border-radius:12px;background:var(--<%= col %>-bg);color:var(--<%= col %>);font-weight:900;font-size:1.3rem;display:flex;align-items:center;justify-content:center;">
+                0<%= c.nomorUrut %>
+              </div>
+              <div>
+                <div style="font-weight:800;color:var(--text-main);font-size:0.95rem;"><%= c.namaKetua %></div>
+                <div class="text-muted text-sm">&amp; <%= c.namaWakil %></div>
+              </div>
+            </div>
+            <div class="flex-between mb-1">
+              <span class="text-xs text-muted font-bold">PEROLEHAN SUARA</span>
+              <span style="font-weight:700;color:var(--<%= col %>);" class="pct-display"><%= p %>%</span>
+            </div>
+            <div class="progress-bar-wrapper" style="height:16px;margin-bottom:0.75rem;">
+              <div class="progress-bar <%= col %> bar-el" style="width:<%= p %>%"></div>
+            </div>
+            <div style="font-size:2.2rem;font-weight:900;color:var(--text-main);line-height:1;" class="count-el"><%= c.suaraCount %></div>
+            <div class="text-xs text-muted">suara sah diterima</div>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+    </main>
+  </div>
+</div>
+<script>
+async function refreshQC() {
+  try {
+    const r = await fetch('/panitia/api/quick-count');
+    const d = await r.json();
+    if (!d.success) return;
+    document.getElementById('t-suara').textContent = d.totalSuara;
+    document.getElementById('t-voted').textContent = d.hasVotedCount;
+    document.getElementById('t-part').textContent = (d.totalVoters > 0 ? Math.round((d.hasVotedCount/d.totalVoters)*100) : 0) + '%';
+    d.candidates.forEach(c => {
+      const el = document.querySelector(`[data-cid="${c.id}"]`);
+      if (!el) return;
+      const p = d.totalSuara > 0 ? ((c.suaraCount/d.totalSuara)*100).toFixed(1) : 0;
+      el.querySelector('.count-el').textContent = c.suaraCount;
+      el.querySelector('.bar-el').style.width = p + '%';
+      el.querySelector('.pct-display').textContent = p + '%';
+    });
+    document.getElementById('last-refresh').textContent = 'Update: ' + new Date().toLocaleTimeString('id-ID');
+  } catch(e) {}
+}
+setInterval(refreshQC, 5000);
+</script>
+</body>
+</html>

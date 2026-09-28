@@ -7,68 +7,75 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// 1. Model Katalog Busana (Kebaya, Jas Formal, Gaun, Beskap, Aksesoris)
-model Item {
-  id          Int          @id @default(autoincrement())
-  code        String       @unique // Contoh: KBY-01, JAS-01
-  name        String       // Contoh: Kebaya Brokat Maroon Modern
-  category    String       // Kebaya, Jas Formal, Gaun Pengantin, Beskap Adat, Aksesoris
-  size        String       @default("All Size") // S, M, L, XL, All Size
-  rentalPrice Int          // Harga sewa per hari (Rp)
-  stock       Int          @default(1)
-  status      String       @default("AVAILABLE") // AVAILABLE, RENTED, LAUNDRY, MAINTENANCE
-  description String?      // Keterangan bahan, warna, kelengkapan
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  rentalItems RentalItem[]
+// 1. Model User: Untuk login sistem RBAC 3 level (ADMIN, PANITIA_TPS, PEMILIH)
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  nama      String
+  role      String   @default("PEMILIH") // "ADMIN" | "PANITIA_TPS" | "PEMILIH"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-// 2. Model Data Pelanggan / Penyewa
-model Customer {
-  id           Int                 @id @default(autoincrement())
-  name         String
-  phone        String
-  address      String?
-  idCardNumber String?             // Nomor KTP / SIM Jaminan
-  createdAt    DateTime            @default(now())
-  rentals      RentalTransaction[]
+// 2. Model Candidate: Pasangan calon ketua & wakil OSIS
+model Candidate {
+  id          Int         @id @default(autoincrement())
+  nomorUrut   Int         @unique
+  namaKetua   String
+  namaWakil   String
+  visi        String
+  misi        String
+  fotoUrl     String
+  suaraCount  Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  voteAudits  VoteAudit[]
 }
 
-// 3. Model Transaksi Persewaan Busana
-model RentalTransaction {
-  id                Int          @id @default(autoincrement())
-  transactionCode   String       @unique // Contoh: SE-82383
-  customerId        Int
-  customer          Customer     @relation(fields: [customerId], references: [id])
-  cashierName       String       @default("Seli (Kasir)")
-  pickupDate        DateTime     // Tanggal Ambil (H-1)
-  eventDate         DateTime     // Hari H (Tanggal Pakai)
-  returnDate        DateTime     // Tanggal Pulang / Kembali (H+1)
-  actualReturnDate  DateTime?    // Tanggal pengembalian riil oleh pelanggan
-  totalBasePrice    Int          // Total tarif sewa busana
-  additionalCharge  Int          @default(0) // Biaya charge / aksesoris tambahan
-  discount          Int          @default(0) // Diskon promo (Rp)
-  finalPrice        Int          // Total tagihan akhir
-  paidAmount        Int          // Nominal dibayar (DP minimal Rp 50.000 atau Lunas)
-  remainingAmount   Int          // Sisa tagihan / kekurangan (Rp)
-  paymentType       String       @default("DP") // DP, LUNAS
-  paymentMethod     String       @default("TUNAI") // TUNAI, TRANSFER, QRIS
-  rentalStatus      String       @default("BOOKING") // BOOKING, DIAMBIL, SELESAI, BATAL, TERLAMBAT
-  customerGuarantee String       @default("E-KTP") // E-KTP, SIM, KTP Pelajar
-  fittingNotes      String?      // Catatan vermak/ukuran: "Jas dikecilin 3 cm di pinggang..."
-  penaltyFee        Int          @default(0) // Denda keterlambatan jika lewat returnDate
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
-  rentalItems       RentalItem[]
+// 3. Model Voter: Daftar Pemilih Tetap (DPT) siswa/guru
+model Voter {
+  id        Int       @id @default(autoincrement())
+  nisn      String    @unique
+  nama      String
+  kelas     String
+  token     String?   @unique
+  isPresent Boolean   @default(false) // Status verifikasi kehadiran fisik di TPS
+  hasVoted  Boolean   @default(false) // Status apakah token sudah dipakai / hangus
+  votedAt   DateTime? // Waktu pemilih menyelesaikan hak suaranya
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([isPresent, hasVoted])
 }
 
-// 4. Model Rincian Busana dalam Transaksi (Pivot Relation)
-model RentalItem {
-  id                  Int               @id @default(autoincrement())
-  rentalTransactionId Int
-  rentalTransaction   RentalTransaction @relation(fields: [rentalTransactionId], references: [id], onDelete: Cascade)
-  itemId              Int
-  item                Item              @relation(fields: [itemId], references: [id])
-  priceAtRent         Int               // Harga sewa pada saat transaksi dibuat
-  itemCustomNote      String?           // Catatan khusus item ini
+// 4. Model VoteAudit: Log audit keabsahan suara tanpa menghubungkan identitas pemilih (Menjamin LUBER-JURDIL)
+model VoteAudit {
+  id             Int       @id @default(autoincrement())
+  candidateId    Int
+  candidate      Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  waktuCoblos    DateTime  @default(now())
+  kodeVerifikasi String    @unique // Hash/kode acak audit bukti integritas
+}
+
+// 5. Model SystemSetting: Konfigurasi status sesi voting (Buka / Kunci) dan jadwal
+model SystemSetting {
+  id           Int      @id @default(autoincrement())
+  sessionName  String   @default("Pemilihan Ketua & Wakil Ketua OSIS/MPK SMK Telkom Masa Bakti 2026/2027")
+  isVotingOpen Boolean  @default(true)
+  startsAt     DateTime?
+  endsAt       DateTime?
+  lockReason   String?  @default("Sesi pemungutan suara telah ditutup oleh Pembina OSIS.")
+  updatedAt    DateTime @updatedAt
+}
+
+// 6. Model ActivityLog: Jejak audit aktifitas keamanan sistem pemilihan
+model ActivityLog {
+  id        Int      @id @default(autoincrement())
+  username  String
+  role      String
+  action    String
+  details   String
+  ipAddress String   @default("127.0.0.1")
+  createdAt DateTime @default(now())
 }

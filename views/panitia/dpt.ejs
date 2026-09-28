@@ -1,0 +1,127 @@
+<%- include('../partials/head') %>
+<div class="layout-wrapper">
+  <%- include('../partials/sidebar', { currentPage: 'dpt' }) %>
+  <div class="main-content">
+    <header class="main-header">
+      <div class="main-header-left">
+        <div>
+          <div class="page-title">📋 Daftar Pemilih Tetap (DPT)</div>
+          <div class="breadcrumb">Panitia TPS &rsaquo; Verifikasi Kehadiran & Token</div>
+        </div>
+      </div>
+      <a href="/panitia/dashboard" class="btn btn-outline btn-sm">← Dashboard</a>
+    </header>
+    <main class="main-body">
+      <% if (success) { %><div class="alert alert-success"><span class="alert-icon">✅</span> <%= success %></div><% } %>
+      <% if (error) { %><div class="alert alert-error"><span class="alert-icon">⚠️</span> <%= error %></div><% } %>
+
+      <!-- Stat Bar -->
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:1.25rem;">
+        <div class="stat-card blue"><div class="stat-value"><%= total %></div><div class="stat-label">Total DPT</div></div>
+        <div class="stat-card green"><div class="stat-value"><%= hasVotedCount %></div><div class="stat-label">Sudah Memilih</div></div>
+        <div class="stat-card amber"><div class="stat-value"><%= presentCount - hasVotedCount %></div><div class="stat-label">Hadir, Belum Coblos</div></div>
+        <div class="stat-card red"><div class="stat-value"><%= notPresentCount %></div><div class="stat-label">Belum Hadir</div></div>
+      </div>
+
+      <!-- Filter & Search -->
+      <form action="/panitia/dpt" method="GET" class="card" style="margin-bottom:1.25rem;">
+        <div class="card-body" style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;padding:1rem 1.25rem;">
+          <div style="flex:2;min-width:200px;">
+            <label class="form-label">Cari Pemilih</label>
+            <input type="text" name="search" class="form-control" placeholder="Nama, NISN, atau kelas..." value="<%= search %>">
+          </div>
+          <div style="flex:1;min-width:160px;">
+            <label class="form-label">Filter Status</label>
+            <select name="status" class="form-control">
+              <option value="">Semua Pemilih</option>
+              <option value="hadir" <%= status==='hadir'?'selected':'' %>>✅ Hadir di TPS</option>
+              <option value="belum-pilih" <%= status==='belum-pilih'?'selected':'' %>>⏳ Hadir, Belum Coblos</option>
+              <option value="sudah-pilih" <%= status==='sudah-pilih'?'selected':'' %>>🗳️ Sudah Memilih</option>
+              <option value="belum" <%= status==='belum'?'selected':'' %>>❌ Belum Hadir</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">🔍 Cari</button>
+          <a href="/panitia/dpt" class="btn btn-outline">Reset</a>
+        </div>
+      </form>
+
+      <!-- DPT Table -->
+      <div class="card">
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>NISN</th>
+                <th>Nama Pemilih</th>
+                <th>Kelas</th>
+                <th>Status Kehadiran</th>
+                <th>Token Voting</th>
+                <th>Status Coblos</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% voters.forEach((v, i) => { %>
+              <tr>
+                <td class="text-xs text-muted"><%= i + 1 %></td>
+                <td class="font-mono text-sm"><%= v.nisn %></td>
+                <td><strong><%= v.nama %></strong></td>
+                <td><span class="badge badge-gray"><%= v.kelas %></span></td>
+                <td>
+                  <% if (v.isPresent) { %>
+                  <span class="badge badge-green">✅ Hadir</span>
+                  <% } else { %>
+                  <span class="badge badge-red">❌ Belum Hadir</span>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (v.token) { %>
+                  <span class="badge badge-green">🔑 Diterbitkan</span>
+                  <% } else { %>
+                  <span class="text-muted text-xs">-</span>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (v.hasVoted) { %>
+                  <span class="badge badge-purple">🗳️ HANGUS</span>
+                  <% } else if (v.isPresent && v.token) { %>
+                  <span class="badge badge-amber">⏳ Menunggu</span>
+                  <% } else { %>
+                  <span class="badge badge-gray">—</span>
+                  <% } %>
+                </td>
+                <td>
+                  <div class="flex gap-2">
+                    <% if (!v.isPresent) { %>
+                    <form action="/panitia/dpt/<%= v.id %>/verify" method="POST" style="display:inline;"
+                      onsubmit="return confirm('Verifikasi kehadiran fisik <%= v.nama %> di TPS?')">
+                      <button type="submit" class="btn btn-sm btn-success">✅ Verifikasi</button>
+                    </form>
+                    <% } else if (!v.hasVoted && !v.token) { %>
+                    <form action="/panitia/dpt/<%= v.id %>/token" method="POST" style="display:inline;"
+                      onsubmit="return confirm('Generate token voting untuk <%= v.nama %>?')">
+                      <button type="submit" class="btn btn-sm btn-primary">🔑 Generate Token</button>
+                    </form>
+                    <% } else if (!v.hasVoted) { %>
+                    <span class="badge badge-amber">Token sudah diserahkan</span>
+                    </form>
+                    <% } else { %>
+                    <span class="badge badge-purple">✓ Selesai</span>
+                    <% } %>
+                  </div>
+                </td>
+              </tr>
+              <% }) %>
+              <% if (voters.length === 0) { %>
+              <tr><td colspan="8" class="text-center text-muted" style="padding:2.5rem;">Tidak ada data pemilih ditemukan.</td></tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

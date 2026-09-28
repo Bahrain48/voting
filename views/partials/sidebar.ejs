@@ -1,0 +1,92 @@
+<!-- Sidebar Navigation -->
+<aside class="sidebar">
+  <!-- Brand -->
+  <div class="sidebar-brand">
+    <a href="/" class="sidebar-brand-logo">
+      <img src="/images/logo-telkom.svg" alt="E-Voting">
+      <div>
+        <div class="sidebar-brand-text">E-Voting OSIS & MPK</div>
+        <div class="sidebar-brand-sub">SMK Telkom Lampung</div>
+      </div>
+    </a>
+  </div>
+
+  <!-- User Info -->
+  <% if (user) { %>
+  <div class="sidebar-user">
+    <div class="sidebar-user-avatar" style="background:
+      <%= user.role === 'ADMIN' ? 'linear-gradient(135deg,#dc2626,#b91c1c)' :
+         user.role === 'PANITIA_TPS' ? 'linear-gradient(135deg,#0284c7,#0369a1)' :
+         'linear-gradient(135deg,#059669,#047857)' %>">
+      <%= user.nama.charAt(0) %>
+    </div>
+    <div class="sidebar-user-info">
+      <div class="sidebar-user-name" title="<%= user.nama %>"><%= user.nama.split(' ').slice(0,3).join(' ') %></div>
+      <span class="sidebar-user-role" style="background:
+        <%= user.role === 'ADMIN' ? 'rgba(220,38,38,0.2)' :
+           user.role === 'PANITIA_TPS' ? 'rgba(2,132,199,0.2)' : 'rgba(5,150,105,0.2)' %>;
+        color:
+        <%= user.role === 'ADMIN' ? '#fca5a5' :
+           user.role === 'PANITIA_TPS' ? '#7dd3fc' : '#6ee7b7' %>">
+        <%= user.role === 'ADMIN' ? '👑 Admin' : user.role === 'PANITIA_TPS' ? '🏫 Panitia TPS' : '🗳️ Pemilih' %>
+      </span>
+    </div>
+  </div>
+  <% } %>
+
+  <!-- Navigation Links -->
+  <nav class="sidebar-nav">
+    <% if (user && user.role === 'ADMIN') { %>
+      <div class="sidebar-section-label">Menu Admin</div>
+      <a href="/admin/dashboard" class="<%= currentPage === 'dashboard' ? 'active' : '' %>">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a href="/admin/candidates" class="<%= currentPage === 'candidates' ? 'active' : '' %>">
+        <span class="nav-icon">👥</span> Manajemen Paslon
+      </a>
+      <a href="/admin/quick-count" class="<%= currentPage === 'quick-count' ? 'active' : '' %>">
+        <span class="nav-icon">📡</span> Quick Count Real-Time
+      </a>
+      <div class="sidebar-section-label">Keamanan</div>
+      <a href="/admin/audit-log" class="<%= currentPage === 'audit-log' ? 'active' : '' %>">
+        <span class="nav-icon">🔍</span> Audit Log Sistem
+      </a>
+
+    <% } else if (user && user.role === 'PANITIA_TPS') { %>
+      <div class="sidebar-section-label">Menu Panitia TPS</div>
+      <a href="/panitia/dashboard" class="<%= currentPage === 'dashboard' ? 'active' : '' %>">
+        <span class="nav-icon">📊</span> Dashboard TPS
+      </a>
+      <a href="/panitia/dpt" class="<%= currentPage === 'dpt' ? 'active' : '' %>">
+        <span class="nav-icon">📋</span> DPT & Verifikasi
+      </a>
+      <a href="/panitia/quick-count" class="<%= currentPage === 'quick-count' ? 'active' : '' %>">
+        <span class="nav-icon">📡</span> Quick Count
+      </a>
+      <a href="/panitia/berita-acara" class="<%= currentPage === 'berita-acara' ? 'active' : '' %>">
+        <span class="nav-icon">🖨️</span> Cetak Berita Acara
+      </a>
+
+    <% } else if (user && user.role === 'PEMILIH') { %>
+      <div class="sidebar-section-label">Bilik Suara</div>
+      <a href="/bilik-suara" class="<%= currentPage === 'bilik' ? 'active' : '' %>">
+        <span class="nav-icon">🗳️</span> Masuk Bilik Suara
+      </a>
+    <% } %>
+  </nav>
+
+  <!-- Footer / Logout -->
+  <div class="sidebar-footer">
+    <% if (systemSetting) { %>
+    <div style="margin-bottom:0.75rem; padding:0.5rem 0.75rem; border-radius:var(--radius-sm); background:rgba(255,255,255,0.05);">
+      <div style="font-size:0.67rem; color:rgba(168,180,216,0.6); font-weight:700; margin-bottom:2px;">STATUS SESI VOTING</div>
+      <div style="font-size:0.75rem; font-weight:700; color:<%= systemSetting.isVotingOpen ? '#6ee7b7' : '#fca5a5' %>">
+        <%= systemSetting.isVotingOpen ? '🟢 SESI DIBUKA' : '🔴 SESI DIKUNCI' %>
+      </div>
+    </div>
+    <% } %>
+    <a href="/logout">
+      <span>🚪</span> Keluar dari Sistem
+    </a>
+  </div>
+</aside>

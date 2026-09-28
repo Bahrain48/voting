@@ -1,0 +1,97 @@
+<%- include('../partials/head') %>
+<div class="layout-wrapper">
+  <%- include('../partials/sidebar', { currentPage: 'dashboard' }) %>
+  <div class="main-content">
+    <header class="main-header">
+      <div class="main-header-left">
+        <div>
+          <div class="page-title">📊 Dashboard Panitia TPS</div>
+          <div class="breadcrumb">Sistem E-Voting OSIS & MPK &rsaquo; Operator TPS</div>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <div class="session-status <%= isVotingOpen ? 'open' : 'locked' %>">
+          <div class="session-dot <%= isVotingOpen ? 'open' : 'locked' %>"></div>
+          <%= isVotingOpen ? 'Sesi AKTIF' : 'Sesi DIKUNCI' %>
+        </div>
+        <a href="/panitia/dpt" class="btn btn-primary">📋 Buka DPT</a>
+      </div>
+    </header>
+    <main class="main-body">
+      <% if (success) { %><div class="alert alert-success"><span class="alert-icon">✅</span> <%= success %></div><% } %>
+      <% if (error) { %><div class="alert alert-error"><span class="alert-icon">⚠️</span> <%= error %></div><% } %>
+
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-card-icon">👥</div>
+          <div class="stat-value"><%= totalVoters %></div>
+          <div class="stat-label">Total DPT</div>
+          <div class="stat-sub">Pemilih terdaftar</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-card-icon">✅</div>
+          <div class="stat-value"><%= hasVotedCount %></div>
+          <div class="stat-label">Sudah Coblos</div>
+          <div class="stat-sub">Token telah hangus</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-card-icon">🏫</div>
+          <div class="stat-value"><%= presentVoters %></div>
+          <div class="stat-label">Hadir di TPS</div>
+          <div class="stat-sub">Terverifikasi fisik</div>
+        </div>
+        <div class="stat-card primary">
+          <div class="stat-card-icon">🔑</div>
+          <div class="stat-value"><%= tokenIssued %></div>
+          <div class="stat-label">Token Diterbitkan</div>
+          <div class="stat-sub">Aktif & hangus</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Quick Count Mini -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📡 Perolehan Suara Saat Ini</div>
+            <a href="/panitia/quick-count" class="btn btn-sm btn-outline">Full View</a>
+          </div>
+          <div class="card-body">
+            <% const colors = ['blue','green','purple']; const ts = candidates.reduce((a,c)=>a+c.suaraCount,0); %>
+            <% candidates.forEach((c,i) => {
+              const p = ts > 0 ? Math.round((c.suaraCount/ts)*100) : 0;
+              const col = colors[i%colors.length];
+            %>
+            <div style="margin-bottom:1rem;">
+              <div class="flex-between mb-1">
+                <span style="font-size:0.82rem;font-weight:700;color:var(--text-main);">0<%= c.nomorUrut %>. <%= c.namaKetua %></span>
+                <span style="font-size:0.82rem;font-weight:700;color:var(--<%= col %>)"><%= c.suaraCount %> (<%= p %>%)</span>
+              </div>
+              <div class="progress-bar-wrapper">
+                <div class="progress-bar <%= col %>" style="width:<%= p %>%"></div>
+              </div>
+            </div>
+            <% }) %>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">⚡ Tindakan Cepat</div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:0.75rem;">
+            <a href="/panitia/dpt" class="btn btn-primary btn-full">
+              📋 Verifikasi Kehadiran & Generate Token
+            </a>
+            <a href="/panitia/quick-count" class="btn btn-outline btn-full">
+              📡 Monitor Quick Count Real-Time
+            </a>
+            <a href="/panitia/berita-acara" class="btn btn-white btn-full">
+              🖨️ Cetak Berita Acara Rekapitulasi
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+    <linearGradient id="badgeGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="600" height="400" rx="16" fill="url(#bgGrad1)"/>
+  <!-- Decorative Grid / Circles -->
+  <circle cx="100" cy="80" r="160" fill="#60A5FA" fill-opacity="0.15"/>
+  <circle cx="520" cy="320" r="140" fill="#93C5FD" fill-opacity="0.1"/>
+  
+  <!-- Candidate 1 - Ketua (Left Figure) -->
+  <g transform="translate(140, 100)">
+    <!-- Body / Suit -->
+    <path d="M-60 260 C-60 170 -30 140 0 140 C30 140 60 170 60 260 Z" fill="#1E293B"/>
+    <!-- Telkom Blazer Shirt & Tie -->
+    <path d="M-25 140 L0 190 L25 140 Z" fill="#FFFFFF"/>
+    <path d="M-6 150 L6 150 L4 185 L0 195 L-4 185 Z" fill="#DC2626"/>
+    <!-- Head -->
+    <circle cx="0" cy="80" r="45" fill="#FED7AA"/>
+    <!-- Hair -->
+    <path d="M-45 75 C-45 30 45 30 45 75 C30 50 -30 50 -45 75 Z" fill="#0F172A"/>
+    <!-- Glasses -->
+    <rect x="-30" y="70" width="24" height="16" rx="4" fill="none" stroke="#0F172A" stroke-width="3"/>
+    <rect x="6" y="70" width="24" height="16" rx="4" fill="none" stroke="#0F172A" stroke-width="3"/>
+    <line x1="-6" y1="78" x2="6" y2="78" stroke="#0F172A" stroke-width="3"/>
+    <!-- Smile -->
+    <path d="M-15 105 Q0 115 15 105" fill="none" stroke="#78350F" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Candidate 1 - Wakil (Right Figure) -->
+  <g transform="translate(340, 110)">
+    <!-- Body / Suit -->
+    <path d="M-55 250 C-55 170 -25 145 0 145 C25 145 55 170 55 250 Z" fill="#1E293B"/>
+    <!-- Hijab / Scarf -->
+    <path d="M-45 65 C-45 15 45 15 45 65 C45 130 30 155 0 155 C-30 155 -45 130 -45 65 Z" fill="#E2E8F0"/>
+    <!-- Face -->
+    <ellipse cx="0" cy="80" rx="30" ry="36" fill="#FFEDD5"/>
+    <!-- Inner Hijab frame -->
+    <path d="M-28 70 C-28 45 28 45 28 70 C28 95 18 114 0 114 C-18 114 -28 95 -28 70 Z" fill="#FFEDD5"/>
+    <ellipse cx="-10" cy="76" rx="3" ry="4" fill="#0F172A"/>
+    <ellipse cx="10" cy="76" rx="3" ry="4" fill="#0F172A"/>
+    <path d="M-12 95 Q0 105 12 95" fill="none" stroke="#9A3412" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Number Badge -->
+  <g transform="translate(40, 35)">
+    <rect width="90" height="90" rx="18" fill="url(#badgeGrad1)"/>
+    <text x="45" y="40" font-family="'Outfit', 'Inter', sans-serif" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">PASLON</text>
+    <text x="45" y="78" font-family="'Outfit', 'Inter', sans-serif" font-size="38" font-weight="900" fill="#FFFFFF" text-anchor="middle">01</text>
+  </g>
+
+  <!-- Bottom Info Overlay -->
+  <rect x="0" y="325" width="600" height="75" fill="#0F172A" fill-opacity="0.85"/>
+  <text x="300" y="354" font-family="'Outfit', 'Inter', sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="middle">M. Fadhil Ramadhan &amp; Aisyah Putri Azzahra</text>
+  <text x="300" y="380" font-family="'Inter', sans-serif" font-size="13" font-weight="400" fill="#93C5FD" text-anchor="middle">"Inovatif, Digital &amp; Berkarakter Global"</text>
+</svg>

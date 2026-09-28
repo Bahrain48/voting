@@ -1,0 +1,246 @@
+<%- include('../partials/head') %>
+<div class="layout-wrapper">
+  <%- include('../partials/sidebar', { currentPage: 'dashboard' }) %>
+  <div class="main-content">
+    <header class="main-header">
+      <div class="main-header-left">
+        <div>
+          <div class="page-title">📊 Dashboard Admin</div>
+          <div class="breadcrumb">Sistem E-Voting OSIS & MPK &rsaquo; Dashboard</div>
+        </div>
+      </div>
+      <div class="flex gap-3 flex-wrap">
+        <div class="session-status <%= isVotingOpen ? 'open' : 'locked' %>">
+          <div class="session-dot <%= isVotingOpen ? 'open' : 'locked' %>"></div>
+          <%= isVotingOpen ? 'Sesi DIBUKA' : 'Sesi DIKUNCI' %>
+        </div>
+        <!-- Toggle Button -->
+        <form action="/admin/session/toggle" method="POST" style="display:inline;">
+          <% if (!isVotingOpen) { %>
+          <button type="submit" class="btn btn-success btn-sm">🔓 Buka Sesi</button>
+          <% } else { %>
+          <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin MENGUNCI sesi voting? Pemilih tidak dapat masuk bilik suara.')">
+            🔒 Kunci Sesi
+          </button>
+          <% } %>
+        </form>
+        <a href="/panitia/berita-acara" class="btn btn-white btn-sm">🖨️ Berita Acara</a>
+      </div>
+    </header>
+
+    <main class="main-body">
+      <% if (success) { %>
+      <div class="alert alert-success"><span class="alert-icon">✅</span> <%= success %></div>
+      <% } %>
+      <% if (error) { %>
+      <div class="alert alert-error"><span class="alert-icon">⚠️</span> <%= error %></div>
+      <% } %>
+
+      <!-- Stat Cards -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-card-icon">👥</div>
+          <div class="stat-value"><%= totalVoters %></div>
+          <div class="stat-label">Total DPT Pemilih</div>
+          <div class="stat-sub">Terdaftar dalam sistem</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-card-icon">✅</div>
+          <div class="stat-value"><%= hasVotedCount %></div>
+          <div class="stat-label">Sudah Memilih</div>
+          <div class="stat-sub">Token telah hangus otomatis</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-card-icon">🏫</div>
+          <div class="stat-value"><%= presentVoters %></div>
+          <div class="stat-label">Hadir di TPS</div>
+          <div class="stat-sub">Terverifikasi fisik panitia</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-card-icon">📊</div>
+          <div class="stat-value"><%= participationRate %>%</div>
+          <div class="stat-label">Partisipasi Suara</div>
+          <div class="stat-sub"><%= hasVotedCount %> dari <%= totalVoters %> pemilih</div>
+        </div>
+        <div class="stat-card primary">
+          <div class="stat-card-icon">🗳️</div>
+          <div class="stat-value"><%= totalSuara %></div>
+          <div class="stat-label">Total Suara Masuk</div>
+          <div class="stat-sub">Suara sah terverifikasi</div>
+        </div>
+        <div class="stat-card teal">
+          <div class="stat-card-icon">👤</div>
+          <div class="stat-value"><%= candidates.length %></div>
+          <div class="stat-label">Paslon Kandidat</div>
+          <div class="stat-sub">Terdaftar & aktif</div>
+        </div>
+      </div>
+
+      <% const toLocalInput = (value) => {
+        if (!value) return '';
+        const date = new Date(value);
+        const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+        return local.toISOString().slice(0, 16);
+      }; %>
+      <div class="card mt-5 mb-6 rounded-xl border border-slate-200 bg-white shadow-sm" style="margin-top:1.25rem;margin-bottom:1.5rem;">
+        <div class="card-header">
+          <div>
+            <div class="card-title">⚙️ Konfigurasi Pemilihan & Jadwal</div>
+            <div class="text-xs text-muted">Di luar rentang jadwal, bilik tidak dapat menerima suara.</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <form action="/admin/session/configure" method="POST">
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label" for="sessionName">Nama pemilihan</label>
+                <input class="form-control" id="sessionName" name="sessionName" maxlength="180" required
+                  value="<%= setting ? setting.sessionName : '' %>">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="startsAt">Waktu mulai (opsional)</label>
+                <input class="form-control" type="datetime-local" id="startsAt" name="startsAt"
+                  value="<%= toLocalInput(setting && setting.startsAt) %>">
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label" for="endsAt">Waktu selesai (opsional)</label>
+                <input class="form-control" type="datetime-local" id="endsAt" name="endsAt"
+                  value="<%= toLocalInput(setting && setting.endsAt) %>">
+              </div>
+              <div class="form-group" style="display:flex;align-items:flex-end;">
+                <button type="submit" class="btn btn-primary">Simpan Konfigurasi</button>
+              </div>
+            </div>
+            <% if (setting && (setting.startsAt || setting.endsAt)) { %>
+            <div class="text-xs text-muted">Jadwal aktif: <%= setting.startsAt ? formatDate(setting.startsAt) : 'tanpa batas mulai' %> — <%= setting.endsAt ? formatDate(setting.endsAt) : 'tanpa batas selesai' %></div>
+            <% } %>
+          </form>
+        </div>
+      </div>
+
+      <!-- Quick Count + Audit Log -->
+      <div class="grid-2">
+        <!-- Quick Count Mini -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📡 Quick Count Live</div>
+            <a href="/admin/quick-count" class="btn btn-sm btn-outline-primary">Lihat Lengkap</a>
+          </div>
+          <div class="card-body">
+            <% if (candidates.length === 0) { %>
+            <p class="text-muted text-sm">Belum ada paslon terdaftar.</p>
+            <% } else { %>
+            <% const colors = ['blue','green','purple','amber','red']; %>
+            <% candidates.forEach((c, i) => {
+               const pct = totalSuara > 0 ? Math.round((c.suaraCount / totalSuara) * 100) : 0;
+               const color = colors[i % colors.length];
+            %>
+            <div class="quickcount-row">
+              <div class="quickcount-number" style="background:var(--<%= color %>-bg);color:var(--<%= color %>)">
+                0<%= c.nomorUrut %>
+              </div>
+              <div class="quickcount-info">
+                <div class="quickcount-name"><%= c.namaKetua %></div>
+                <div class="quickcount-sub">&amp; <%= c.namaWakil %></div>
+                <div style="margin-top:0.4rem;">
+                  <div class="progress-bar-wrapper">
+                    <div class="progress-bar <%= color %>" style="width:<%= pct %>%"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="quickcount-votes">
+                <div class="quickcount-count"><%= c.suaraCount %></div>
+                <div class="quickcount-pct"><%= pct %>%</div>
+              </div>
+            </div>
+            <% }) %>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Recent Activity Log -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔍 Aktivitas Terbaru</div>
+            <a href="/admin/audit-log" class="btn btn-sm btn-outline">Lihat Semua</a>
+          </div>
+          <div class="card-body p-0">
+            <% recentLogs.forEach(log => { %>
+            <div style="padding:0.75rem 1.25rem; border-bottom:1px solid var(--border-subtle); display:flex; gap:0.75rem; align-items:flex-start;">
+              <div style="width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0;background:
+                <%= log.role === 'ADMIN' ? 'var(--red)' : log.role === 'PANITIA_TPS' ? 'var(--blue)' : 'var(--green)' %>">
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:0.78rem;font-weight:700;color:var(--text-main);">
+                  <%= log.action.replace(/_/g,' ') %>
+                </div>
+                <div style="font-size:0.71rem;color:var(--text-muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                  <%= log.details %>
+                </div>
+                <div style="font-size:0.68rem;color:var(--text-dark);margin-top:2px;">
+                  <%= log.username %> &bull; <%= formatDate(log.createdAt) %>
+                </div>
+              </div>
+            </div>
+            <% }) %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Candidate Summary -->
+      <div class="card" style="margin-top:1.5rem;">
+        <div class="card-header">
+          <div class="card-title">👥 Pasangan Calon Terdaftar</div>
+          <a href="/admin/candidates" class="btn btn-sm btn-primary">Kelola Paslon</a>
+        </div>
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>No. Urut</th>
+                <th>Ketua</th>
+                <th>Wakil</th>
+                <th>Perolehan Suara</th>
+                <th>Persentase</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (candidates.length === 0) { %>
+              <tr><td colspan="6" class="text-center text-muted" style="padding:2rem;">Belum ada paslon. Silakan tambahkan.</td></tr>
+              <% } %>
+              <% candidates.forEach(c => {
+                const pct = totalSuara > 0 ? Math.round((c.suaraCount / totalSuara) * 100) : 0;
+              %>
+              <tr>
+                <td><span class="badge badge-amber font-mono font-bold">0<%= c.nomorUrut %></span></td>
+                <td><strong><%= c.namaKetua %></strong></td>
+                <td><%= c.namaWakil %></td>
+                <td>
+                  <strong style="font-size:1.1rem;color:var(--primary)"><%= c.suaraCount %></strong>
+                  <span class="text-muted text-xs"> suara</span>
+                </td>
+                <td>
+                  <div class="flex gap-2" style="align-items:center;">
+                    <div class="progress-bar-wrapper" style="flex:1;width:80px;">
+                      <div class="progress-bar blue" style="width:<%= pct %>%"></div>
+                    </div>
+                    <span class="text-xs font-bold"><%= pct %>%</span>
+                  </div>
+                </td>
+                <td>
+                  <a href="/admin/candidates/<%= c.id %>/edit" class="btn btn-sm btn-outline">✏️ Edit</a>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

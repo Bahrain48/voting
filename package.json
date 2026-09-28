@@ -1,7 +1,7 @@
 {
-  "name": "website-sewa-kebayajas",
+  "name": "e-voting-osis-mpk",
   "version": "1.0.0",
-  "description": "Sistem Informasi Manajemen Persewaan Busana (Kebaya & Jas) SEWA AJA - Workshop PjBL SMK Telkom Lampung Hari Ke-2",
+  "description": "Sistem E-Voting Pemilihan OSIS & MPK SMK Telkom - Berbasis Token Sekali Pakai & Quick Count Real-Time",
   "main": "src/server.js",
   "scripts": {
     "dev": "nodemon src/server.js",
@@ -9,7 +9,10 @@
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "prisma:studio": "prisma studio",
-    "seed": "node prisma/seed.js"
+    "seed": "node prisma/seed.js",
+    "db:setup": "prisma generate && prisma db push && node prisma/seed.js",
+    "build:css": "tailwindcss -i ./src/styles/tailwind.css -o ./public/css/tailwind.css --minify",
+    "test": "node --test"
   },
   "keywords": [
     "nodejs",
@@ -23,13 +26,16 @@
   "author": "Muhammad Fari Madyan, S.Kom (Lampung Dev)",
   "license": "MIT",
   "dependencies": {
-    "@prisma/client": "^6.4.1",
+    "@prisma/client": "6.12.0",
+    "bcryptjs": "^3.0.3",
     "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "express-session": "^1.19.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.9",
-    "prisma": "^6.4.1"
+    "prisma": "6.12.0",
+    "tailwindcss": "^3.4.17"
   }
 }

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="telkomGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EF4444" />
+      <stop offset="100%" stop-color="#B91C1C" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  <!-- Background Badge -->
+  <rect x="10" y="10" width="100" height="100" rx="24" fill="url(#telkomGrad)" filter="url(#shadow)"/>
+  <!-- Shield Emblem -->
+  <path d="M60 26 L86 36 V62 C86 78 60 92 60 92 C60 92 34 78 34 62 V36 Z" fill="#FFFFFF" fill-opacity="0.15" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Voting Ballot Box & Check Icon -->
+  <rect x="44" y="52" width="32" height="24" rx="4" fill="#FFFFFF"/>
+  <path d="M48 52 L54 42 L66 42 L72 52 Z" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.5"/>
+  <path d="M52 64 L58 70 L68 58" fill="none" stroke="#DC2626" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Star Accent -->
+  <circle cx="60" cy="35" r="3" fill="#FDE047"/>
+</svg>

@@ -1,0 +1,75 @@
+<%- include('../partials/head') %>
+<div class="layout-wrapper">
+  <%- include('../partials/sidebar', { currentPage: 'audit-log' }) %>
+  <div class="main-content">
+    <header class="main-header">
+      <div class="main-header-left">
+        <div>
+          <div class="page-title">🔍 Audit Log Sistem</div>
+          <div class="breadcrumb">Dashboard &rsaquo; Audit Log &bull; <strong><%= total %></strong> total entri</div>
+        </div>
+      </div>
+      <a href="/admin/dashboard" class="btn btn-outline">← Dashboard</a>
+    </header>
+    <main class="main-body">
+      <div class="card">
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Waktu</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Aksi</th>
+                <th>Detail</th>
+                <th>IP</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% logs.forEach((log, i) => { %>
+              <tr>
+                <td class="text-muted text-xs font-mono"><%= log.id %></td>
+                <td class="text-xs font-mono" style="white-space:nowrap;"><%= formatDate(log.createdAt) %></td>
+                <td><strong class="font-mono text-sm"><%= log.username %></strong></td>
+                <td>
+                  <span class="badge <%= log.role === 'ADMIN' ? 'badge-red' : log.role === 'PANITIA_TPS' ? 'badge-blue' : 'badge-green' %>">
+                    <%= log.role %>
+                  </span>
+                </td>
+                <td>
+                  <span class="badge badge-gray font-mono text-xs">
+                    <%= log.action %>
+                  </span>
+                </td>
+                <td style="max-width:300px;font-size:0.78rem;color:var(--text-body);">
+                  <%= log.details %>
+                </td>
+                <td class="text-xs font-mono text-muted"><%= log.ipAddress %></td>
+              </tr>
+              <% }) %>
+              <% if (logs.length === 0) { %>
+              <tr><td colspan="7" class="text-center text-muted" style="padding:2rem;">Belum ada log aktivitas.</td></tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+        <% if (totalPages > 1) { %>
+        <div class="card-footer flex-between">
+          <span class="text-xs text-muted">Halaman <%= page %> dari <%= totalPages %> &bull; Total <%= total %> entri</span>
+          <div class="flex gap-2">
+            <% if (page > 1) { %>
+            <a href="?page=<%= page - 1 %>" class="btn btn-sm btn-outline">← Sebelumnya</a>
+            <% } %>
+            <% if (page < totalPages) { %>
+            <a href="?page=<%= page + 1 %>" class="btn btn-sm btn-outline">Selanjutnya →</a>
+            <% } %>
+          </div>
+        </div>
+        <% } %>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

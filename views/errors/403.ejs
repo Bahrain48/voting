@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>403 Akses Ditolak - E-Voting OSIS & MPK</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg-main);padding:2rem;">
+  <div style="max-width:520px;width:100%;text-align:center;">
+    <div style="font-size:5rem;margin-bottom:1rem;">🚫</div>
+    <h1 style="font-size:2.5rem;font-weight:900;color:var(--red);margin-bottom:0.5rem;">403</h1>
+    <h2 style="font-size:1.2rem;font-weight:700;color:var(--text-main);margin-bottom:0.75rem;">Akses Ditolak</h2>
+    <p style="color:var(--text-muted);font-size:0.87rem;margin-bottom:1.5rem;">
+      Anda tidak memiliki izin untuk mengakses halaman ini.<br>
+      Role Anda (<strong><%= userRole %></strong>) tidak termasuk dalam: <strong><%= allowedRoles.join(', ') %></strong>.
+    </p>
+    <div class="alert alert-error" style="text-align:left;">
+      <span class="alert-icon">🔒</span>
+      <span>Middleware RBAC mencegah akses tidak sah ke <code><%= path %></code>.</span>
+    </div>
+    <div class="flex gap-3" style="justify-content:center;margin-top:1.5rem;">
+      <a href="/" class="btn btn-primary">← Kembali ke Beranda</a>
+      <a href="/logout" class="btn btn-outline">Logout</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/tailwind.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="bilik-wrapper">
+  <!-- Header Bilik Suara -->
+  <div class="bilik-header" style="max-width:900px;margin:0 auto 2rem;">
+    <div style="font-size:2rem;">🗳️</div>
+    <h1>Bilik Suara Digital — E-Voting OSIS & MPK</h1>
+    <p>SMK Telkom Lampung &mdash; Pilih dengan hati nurani, satu suara menentukan masa depan</p>
+    <% if (voter) { %>
+    <div class="bilik-voter-info">
+      <span>👤 <%= voter.nama %></span>
+      <span style="opacity:0.5;">|</span>
+      <span>🏫 <%= voter.kelas %></span>
+      <span style="opacity:0.5;">|</span>
+      <span class="font-mono">NISN: <%= voter.nisn %></span>
+      <span style="opacity:0.5;">|</span>
+      <span class="font-mono" style="background:rgba(255,255,255,0.15);padding:2px 8px;border-radius:6px;">Token: <%= voter.token %></span>
+    </div>
+    <% } %>
+  </div>
+
+  <% if (error) { %>
+  <div class="alert alert-error" style="max-width:900px;margin:0 auto 1.5rem;">
+    <span class="alert-icon">⚠️</span> <%= error %>
+  </div>
+  <% } %>
+
+  <!-- Instruksi -->
+  <div class="alert alert-info" style="max-width:900px;margin:0 auto 1.5rem;">
+    <span class="alert-icon">ℹ️</span>
+    <span><strong>Petunjuk Memilih:</strong> Klik kartu paslon yang Anda pilih, baca visi-misinya, lalu klik tombol <strong>"COBLOS SEKARANG"</strong> di bawah untuk menggunakan hak suara Anda. Suara hanya dapat diberikan <strong>satu kali</strong>.</span>
+  </div>
+
+  <!-- Form Pemilihan -->
+  <form action="/bilik-suara/coblos" method="POST" id="voting-form" onsubmit="return confirmVote()">
+    <div class="candidates-grid">
+      <% candidates.forEach((c, i) => {
+        const bgColors = ['#1E3A8A','#065F46','#4C1D95'];
+        const bg = bgColors[i % bgColors.length];
+      %>
+      <label class="candidate-card" for="candidate-<%= c.id %>">
+        <input type="radio" name="candidateId" value="<%= c.id %>" id="candidate-<%= c.id %>" onchange="selectCandidate(this)">
+
+        <div class="candidate-number">
+          <span>NO</span>
+          0<%= c.nomorUrut %>
+        </div>
+
+        <!-- Foto Paslon -->
+        <div class="candidate-photo" style="background:linear-gradient(135deg,<%= bg %>,<%= bg %>cc);">
+          <img src="<%= c.fotoUrl %>" alt="Paslon <%= c.nomorUrut %>"
+            onerror="this.src='/images/paslon<%= c.nomorUrut %>.svg'">
+        </div>
+
+        <!-- Info Paslon -->
+        <div class="candidate-body">
+          <div class="candidate-names">
+            <div class="ketua">🎓 <%= c.namaKetua %></div>
+            <div class="wakil">👤 <%= c.namaWakil %></div>
+          </div>
+
+          <div class="candidate-visi-label">Visi Paslon</div>
+          <div class="candidate-visi"><%= c.visi %></div>
+
+          <details style="margin-top:0.5rem;">
+            <summary style="font-size:0.75rem;font-weight:700;color:var(--primary);cursor:pointer;margin-bottom:0.4rem;">📋 Lihat Misi Paslon</summary>
+            <div style="font-size:0.75rem;color:var(--text-body);line-height:1.7;white-space:pre-line;background:var(--bg-subtle);padding:0.75rem;border-radius:8px;margin-top:0.4rem;">
+              <%= c.misi %>
+            </div>
+          </details>
+        </div>
+      </label>
+      <% }) %>
+    </div>
+
+    <!-- Tombol Coblos -->
+    <div style="text-align:center;max-width:500px;margin:0 auto 2rem;">
+      <div id="pilihan-info" style="margin-bottom:1rem;font-size:0.85rem;color:var(--text-muted);min-height:1.5rem;">
+        Silakan pilih salah satu paslon di atas terlebih dahulu.
+      </div>
+      <button type="submit" id="btn-coblos" class="btn btn-primary btn-xl btn-full" disabled
+        style="font-size:1.1rem;font-weight:800;opacity:0.5;transition:all 0.3s;">
+        🗳️ COBLOS SEKARANG
+      </button>
+      <div style="margin-top:0.75rem;font-size:0.72rem;color:var(--text-muted);">
+        ⚠️ Suara bersifat rahasia dan <strong>tidak dapat diubah</strong> setelah dikonfirmasi.
+      </div>
+    </div>
+  </form>
+
+  <div style="text-align:center;max-width:900px;margin:0 auto;">
+    <a href="/logout" class="btn btn-ghost text-sm">🚪 Keluar dari Bilik Suara</a>
+  </div>
+</div>
+
+<script>
+let selectedNama = '';
+
+function selectCandidate(radio) {
+  document.querySelectorAll('.candidate-card').forEach(c => c.classList.remove('selected'));
+  const label = document.querySelector(`label[for="${radio.id}"]`);
+  if (label) label.classList.add('selected');
+
+  const cardNama = label.querySelector('.ketua').textContent.replace('🎓 ', '');
+  selectedNama = cardNama;
+  document.getElementById('pilihan-info').innerHTML = `✅ Anda memilih: <strong>${selectedNama}</strong>`;
+  document.getElementById('btn-coblos').disabled = false;
+  document.getElementById('btn-coblos').style.opacity = '1';
+}
+
+function confirmVote() {
+  if (!selectedNama) {
+    alert('⚠️ Pilih paslon terlebih dahulu!');
+    return false;
+  }
+  return confirm(
+    `🗳️ KONFIRMASI COBLOS\n\nAnda akan memberikan suara kepada:\n${selectedNama}\n\nSuara tidak dapat diubah setelah dikonfirmasi.\n✅ Klik OK untuk COBLOS / Batal untuk kembali memilih.`
+  );
+}
+</script>
+</body>
+</html>

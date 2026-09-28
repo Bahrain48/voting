@@ -1,0 +1,91 @@
+<%- include('../../partials/head') %>
+<div class="layout-wrapper">
+  <%- include('../../partials/sidebar', { currentPage: 'candidates' }) %>
+  <div class="main-content">
+    <header class="main-header">
+      <div class="main-header-left">
+        <div>
+          <div class="page-title">👥 Manajemen Paslon Kandidat</div>
+          <div class="breadcrumb">Dashboard &rsaquo; Pasangan Calon</div>
+        </div>
+      </div>
+      <a href="/admin/candidates/add" class="btn btn-primary">+ Tambah Paslon</a>
+    </header>
+    <main class="main-body">
+      <% if (success) { %>
+      <div class="alert alert-success"><span class="alert-icon">✅</span> <%= success %></div>
+      <% } %>
+      <% if (error) { %>
+      <div class="alert alert-error"><span class="alert-icon">⚠️</span> <%= error %></div>
+      <% } %>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Daftar Pasangan Calon Terdaftar (<%= candidates.length %> Paslon)</div>
+        </div>
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>No. Urut</th>
+                <th>Foto</th>
+                <th>Ketua OSIS</th>
+                <th>Wakil Ketua</th>
+                <th>Visi (Ringkas)</th>
+                <th>Suara</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (candidates.length === 0) { %>
+              <tr>
+                <td colspan="7" class="text-center" style="padding:3rem;">
+                  <div style="font-size:2.5rem;margin-bottom:0.5rem;">👥</div>
+                  <div class="text-muted">Belum ada paslon terdaftar. Silakan tambahkan pasangan calon.</div>
+                  <a href="/admin/candidates/add" class="btn btn-primary" style="margin-top:1rem;">+ Tambah Paslon Pertama</a>
+                </td>
+              </tr>
+              <% } %>
+              <% candidates.forEach(c => { %>
+              <tr>
+                <td>
+                  <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:1.1rem;">
+                    0<%= c.nomorUrut %>
+                  </div>
+                </td>
+                <td>
+                  <img src="<%= c.fotoUrl %>" alt="Paslon <%= c.nomorUrut %>"
+                    style="width:60px;height:40px;object-fit:cover;border-radius:6px;background:var(--bg-subtle);"
+                    onerror="this.style.background='var(--primary-light)';this.src='/images/paslon<%= c.nomorUrut %>.svg'">
+                </td>
+                <td><strong><%= c.namaKetua %></strong></td>
+                <td><%= c.namaWakil %></td>
+                <td>
+                  <div style="max-width:280px;font-size:0.78rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                    <%= c.visi %>
+                  </div>
+                </td>
+                <td>
+                  <span style="font-size:1.2rem;font-weight:800;color:var(--primary)"><%= c.suaraCount %></span>
+                  <span class="text-xs text-muted"> suara</span>
+                </td>
+                <td>
+                  <div class="flex gap-2">
+                    <a href="/admin/candidates/<%= c.id %>/edit" class="btn btn-sm btn-outline">✏️ Edit</a>
+                    <form action="/admin/candidates/<%= c.id %>/delete" method="POST" style="display:inline;"
+                      onsubmit="return confirm('Hapus Paslon <%= c.namaKetua %>? Semua data suara akan ikut dihapus!')">
+                      <button type="submit" class="btn btn-sm btn-danger">🗑️ Hapus</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

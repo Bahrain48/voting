@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Login Sistem E-Voting Pemilihan OSIS & MPK SMK Telkom Lampung">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/tailwind.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="/images/logo-telkom.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="login-page">
+  <div class="login-box">
+    <!-- Header -->
+    <div class="login-header">
+      <div class="login-header-logo">🗳️</div>
+      <h1>Sistem E-Voting OSIS & MPK</h1>
+      <p>SMK Telkom Lampung &mdash; Pemilihan Demokratis & Transparan</p>
+    </div>
+
+    <!-- Body -->
+    <div class="login-body">
+      <% if (error) { %>
+      <div class="alert alert-error">
+        <span class="alert-icon">⚠️</span>
+        <span><%= error %></span>
+      </div>
+      <% } %>
+      <% if (success) { %>
+      <div class="alert alert-success">
+        <span class="alert-icon">✅</span>
+        <span><%= success %></span>
+      </div>
+      <% } %>
+
+      <!-- Tabs -->
+      <div class="login-tabs">
+        <button class="login-tab active" onclick="switchTab('tab-staf', this)" id="btn-staf">👤 Login Staf</button>
+        <button class="login-tab" onclick="switchTab('tab-bilik', this)" id="btn-bilik">🗳️ Bilik Suara</button>
+      </div>
+
+      <!-- Tab: Login Staf (Admin & Panitia) -->
+      <div id="tab-staf" class="login-tab-content active">
+        <!-- Demo Switcher -->
+        <div class="demo-switcher">
+          <div class="demo-switcher-title">🚀 Quick Login Demo (Klik untuk isi otomatis)</div>
+          <div class="demo-switcher-btns">
+            <button class="demo-btn" onclick="fillDemo('admin','password123')">👑 Admin</button>
+            <button class="demo-btn" onclick="fillDemo('panitia','password123')">🏫 Panitia TPS</button>
+            <button class="demo-btn" onclick="fillDemo('pemilih','password123')">🗳️ Pemilih (Akun)</button>
+          </div>
+        </div>
+
+        <form action="/login" method="POST" id="form-staf">
+          <div class="form-group">
+            <label class="form-label" for="username">Username</label>
+            <input type="text" id="username" name="username" class="form-control" placeholder="Masukkan username..." required autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="Masukkan password..." required autocomplete="current-password">
+          </div>
+          <button type="submit" class="btn btn-primary btn-full btn-lg">Masuk ke Sistem →</button>
+        </form>
+      </div>
+
+      <!-- Tab: Bilik Suara (NISN + Token) -->
+      <div id="tab-bilik" class="login-tab-content">
+        <div class="demo-switcher" style="background:var(--green-bg);border-color:var(--green-border);">
+          <div class="demo-switcher-title" style="color:var(--green-text);">🗳️ Demo Bilik Suara (Klik untuk isi otomatis)</div>
+          <div class="demo-switcher-btns">
+            <% if (sampleVoter) { %>
+            <button class="demo-btn" style="border-color:var(--green-border);color:var(--green-text);"
+              onclick="fillBilik('<%= sampleVoter.nisn %>', '<%= sampleVoter.token %>')">
+              NISN: <%= sampleVoter.nisn %> / Token: <%= sampleVoter.token %>
+            </button>
+            <% } %>
+          </div>
+        </div>
+
+        <form action="/login/bilik" method="POST" id="form-bilik">
+          <div class="form-group">
+            <label class="form-label" for="nisn">NISN Pemilih</label>
+            <input type="text" id="nisn" name="nisn" class="form-control font-mono" placeholder="Contoh: 20240001" required autocomplete="off">
+            <div class="form-hint">Nomor Induk Siswa Nasional sesuai DPT</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="token">Token Voting</label>
+            <input type="text" id="token" name="token" class="form-control font-mono" placeholder="Contoh: TK-A9K2" required autocomplete="off">
+            <div class="form-hint">Token sekali pakai yang diberikan panitia TPS</div>
+          </div>
+          <button type="submit" class="btn btn-success btn-full btn-lg">Masuk Bilik Suara →</button>
+        </form>
+      </div>
+
+      <!-- Footer Info -->
+      <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--border-color); text-align:center;">
+        <p style="font-size:0.72rem; color:var(--text-muted);">
+          🔒 Sistem E-Voting berbasis token sekali pakai &mdash; Menjamin kerahasiaan suara (LUBER JURDIL)<br>
+          <strong>SMK Telkom Lampung</strong> &mdash; Pemilihan OSIS & MPK Masa Bakti 2026/2027
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(tabId, btn) {
+    document.querySelectorAll('.login-tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.login-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+  }
+  function fillDemo(user, pass) {
+    document.getElementById('username').value = user;
+    document.getElementById('password').value = pass;
+  }
+  function fillBilik(nisn, token) {
+    document.getElementById('nisn').value = nisn;
+    document.getElementById('token').value = token;
+  }
+  // Auto-switch tab jika ada error terkait bilik
+  const urlParams = new URLSearchParams(window.location.search);
+  const errorMsg = urlParams.get('error') || '';
+  if (errorMsg.includes('NISN') || errorMsg.includes('Token') || errorMsg.includes('token') || errorMsg.includes('bilik')) {
+    switchTab('tab-bilik', document.getElementById('btn-bilik'));
+  }
+</script>
+</body>
+</html>

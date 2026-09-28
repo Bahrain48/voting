@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/tailwind.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { background: #fff; font-family: 'Plus Jakarta Sans', sans-serif; padding: 0; }
+    .ba-wrapper { max-width: 900px; margin: 0 auto; padding: 2rem; }
+    .ba-header { background: #1a1f3a; color: #fff; padding: 2rem; border-radius: 12px 12px 0 0; text-align: center; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .ba-logo { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .ba-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 0.25rem; }
+    .ba-subtitle { font-size: 0.82rem; opacity: 0.8; }
+    .ba-body { border: 2px solid #1a1f3a; border-top: none; padding: 2rem; }
+    .ba-section { margin-bottom: 2rem; }
+    .ba-section-title { font-size: 1rem; font-weight: 800; color: #1a1f3a; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; margin-bottom: 1rem; }
+    .ba-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .ba-table th { background: #f0f4ff; padding: 0.6rem 0.8rem; text-align: left; font-size: 0.75rem; font-weight: 700; color: #334155; border: 1px solid #e2e8f0; }
+    .ba-table td { padding: 0.6rem 0.8rem; border: 1px solid #e2e8f0; vertical-align: middle; }
+    .winner-badge { background: linear-gradient(135deg,#d97706,#f59e0b); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 800; }
+    .sign-area { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem; }
+    .sign-box { text-align: center; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px; }
+    .sign-line { border-top: 1px solid #1a1f3a; margin: 3rem auto 0.5rem; width: 80%; }
+    .no-print-bar { padding: 1rem; text-align: center; background: var(--blue-bg); border-radius: 8px; margin-bottom: 1.5rem; }
+    @media print { .no-print-bar { display: none; } .ba-wrapper { padding: 0; } }
+  </style>
+</head>
+<body>
+<div class="ba-wrapper">
+  <!-- Print Button (hidden on print) -->
+  <div class="no-print-bar">
+    <button onclick="window.print()" class="btn btn-primary" style="margin-right:0.75rem;">🖨️ Cetak Berita Acara (PDF/Print)</button>
+    <a href="/panitia/dashboard" class="btn btn-outline">← Kembali</a>
+    <span style="font-size:0.78rem;color:var(--text-muted);margin-left:1rem;">📌 Tekan Ctrl+P atau klik tombol cetak untuk mencetak dokumen resmi.</span>
+  </div>
+
+  <!-- Berita Acara Document -->
+  <div class="ba-header">
+    <div class="ba-logo">🗳️</div>
+    <div class="ba-title">BERITA ACARA REKAPITULASI SUARA</div>
+    <div class="ba-subtitle">PEMILIHAN KETUA & WAKIL KETUA OSIS/MPK</div>
+    <div class="ba-subtitle" style="margin-top:4px;font-size:0.9rem;font-weight:700;">
+      <%= setting ? setting.sessionName : 'SMK Telkom Lampung' %>
+    </div>
+  </div>
+
+  <div class="ba-body">
+    <!-- Info Umum -->
+    <div class="ba-section">
+      <div class="ba-section-title">I. INFORMASI UMUM PEMILIHAN</div>
+      <table class="ba-table">
+        <tr>
+          <td style="width:35%;font-weight:700;background:#f8fafc;">Nama Kegiatan</td>
+          <td>Pemilihan Ketua & Wakil Ketua OSIS/MPK SMK Telkom Lampung</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;background:#f8fafc;">Metode Pemilihan</td>
+          <td>E-Voting Berbasis Token Sekali Pakai (One-Time Token)</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;background:#f8fafc;">Status Sesi</td>
+          <td><%= isVotingOpen ? '🟢 Sesi Masih Aktif' : '🔴 Sesi Telah Ditutup' %></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;background:#f8fafc;">Waktu Cetak</td>
+          <td><%= formatDate(printedAt) %></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;background:#f8fafc;">Dicetak Oleh</td>
+          <td><%= printedBy %> (Panitia TPS)</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Hasil Perolehan Suara -->
+    <div class="ba-section">
+      <div class="ba-section-title">II. REKAPITULASI PEROLEHAN SUARA</div>
+      <table class="ba-table">
+        <thead>
+          <tr>
+            <th>No. Urut</th>
+            <th>Calon Ketua</th>
+            <th>Calon Wakil</th>
+            <th>Perolehan Suara</th>
+            <th>Persentase</th>
+            <th>Keterangan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% candidates.forEach(c => {
+            const pct = totalSuara > 0 ? ((c.suaraCount / totalSuara) * 100).toFixed(2) : '0.00';
+            const isWinner = winner && winner.id === c.id;
+          %>
+          <tr>
+            <td style="text-align:center;font-weight:900;font-size:1.1rem;">0<%= c.nomorUrut %></td>
+            <td><strong><%= c.namaKetua %></strong></td>
+            <td><%= c.namaWakil %></td>
+            <td style="text-align:center;font-weight:800;font-size:1.1rem;"><%= c.suaraCount %> suara</td>
+            <td style="text-align:center;"><%= pct %>%</td>
+            <td>
+              <% if (isWinner && totalSuara > 0) { %>
+              <span class="winner-badge">🏆 TERPILIH</span>
+              <% } else { %>—<% } %>
+            </td>
+          </tr>
+          <% }) %>
+          <tr style="background:#f0f4ff;font-weight:800;">
+            <td colspan="3" style="text-align:right;font-weight:800;">TOTAL SUARA SAH</td>
+            <td style="text-align:center;font-size:1.1rem;"><%= totalSuara %> suara</td>
+            <td style="text-align:center;">100.00%</td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Statistik DPT -->
+    <div class="ba-section">
+      <div class="ba-section-title">III. STATISTIK PARTISIPASI PEMILIH</div>
+      <table class="ba-table">
+        <tr><td style="width:50%;font-weight:700;background:#f8fafc;">Total Daftar Pemilih Tetap (DPT)</td><td><%= totalVoters %> pemilih</td></tr>
+        <tr><td style="font-weight:700;background:#f8fafc;">Pemilih yang Menggunakan Hak Suara</td><td><%= hasVotedCount %> pemilih</td></tr>
+        <tr><td style="font-weight:700;background:#f8fafc;">Pemilih yang Tidak Hadir / Golput</td><td><%= totalVoters - hasVotedCount %> pemilih</td></tr>
+        <tr><td style="font-weight:700;background:#f8fafc;">Tingkat Partisipasi</td><td><strong><%= totalVoters > 0 ? ((hasVotedCount/totalVoters)*100).toFixed(2) : 0 %>%</strong></td></tr>
+        <tr><td style="font-weight:700;background:#f8fafc;">Total Suara Sah Dihitung</td><td><strong><%= totalSuara %> suara</strong></td></tr>
+      </table>
+    </div>
+
+    <!-- Pemenang -->
+    <% if (winner && totalSuara > 0) { %>
+    <div class="ba-section">
+      <div class="ba-section-title">IV. HASIL PENETAPAN PEMENANG</div>
+      <div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #d97706;border-radius:10px;padding:1.5rem;text-align:center;">
+        <div style="font-size:1.5rem;margin-bottom:0.5rem;">🏆</div>
+        <div style="font-size:0.75rem;font-weight:800;color:#92400e;letter-spacing:0.05em;margin-bottom:0.4rem;">PASANGAN CALON TERPILIH</div>
+        <div style="font-size:1.2rem;font-weight:900;color:#1a1f3a;">
+          PASLON NOMOR URUT 0<%= winner.nomorUrut %>
+        </div>
+        <div style="font-size:1rem;font-weight:700;color:#1a1f3a;margin-top:0.25rem;">
+          <%= winner.namaKetua %> &amp; <%= winner.namaWakil %>
+        </div>
+        <div style="font-size:0.85rem;color:#92400e;margin-top:0.5rem;">
+          Perolehan: <strong><%= winner.suaraCount %> suara</strong>
+          (<%= totalSuara > 0 ? ((winner.suaraCount/totalSuara)*100).toFixed(2) : 0 %>% dari total suara sah)
+        </div>
+      </div>
+    </div>
+    <% } %>
+
+    <!-- Tanda Tangan -->
+    <div class="sign-area">
+      <div class="sign-box">
+        <div style="font-size:0.8rem;font-weight:700;margin-bottom:0.25rem;">Ketua Komisi Pemilihan (KPU)</div>
+        <div style="font-size:0.72rem;color:#64748b;">SMK Telkom Lampung</div>
+        <div class="sign-line"></div>
+        <div style="font-size:0.78rem;font-weight:700;">(.......................................)</div>
+      </div>
+      <div class="sign-box">
+        <div style="font-size:0.8rem;font-weight:700;margin-bottom:0.25rem;">Pembina OSIS / Saksi</div>
+        <div style="font-size:0.72rem;color:#64748b;">SMK Telkom Lampung</div>
+        <div class="sign-line"></div>
+        <div style="font-size:0.78rem;font-weight:700;">(.......................................)</div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:2rem;font-size:0.72rem;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:1rem;">
+      Dokumen ini dicetak secara otomatis oleh Sistem E-Voting OSIS & MPK SMK Telkom Lampung pada <%= formatDate(printedAt) %>.<br>
+      Keabsahan dokumen dapat diverifikasi melalui administrator sistem.
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4C1D95"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="badgeGrad3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="600" height="400" rx="16" fill="url(#bgGrad3)"/>
+  <!-- Decorative Grid / Circles -->
+  <circle cx="100" cy="80" r="150" fill="#A78BFA" fill-opacity="0.15"/>
+  <circle cx="500" cy="310" r="140" fill="#C4B5FD" fill-opacity="0.1"/>
+  
+  <!-- Candidate 3 - Ketua (Left Figure) -->
+  <g transform="translate(150, 100)">
+    <!-- Body / Suit -->
+    <path d="M-60 260 C-60 170 -30 140 0 140 C30 140 60 170 60 260 Z" fill="#1E293B"/>
+    <!-- Telkom Blazer Shirt & Tie -->
+    <path d="M-25 140 L0 190 L25 140 Z" fill="#FFFFFF"/>
+    <path d="M-6 150 L6 150 L4 185 L0 195 L-4 185 Z" fill="#6D28D9"/>
+    <!-- Head -->
+    <circle cx="0" cy="80" r="45" fill="#FED7AA"/>
+    <!-- Short Hair -->
+    <path d="M-45 75 C-45 25 45 25 45 75 C30 45 -30 45 -45 75 Z" fill="#1E1B4B"/>
+    <!-- Face details -->
+    <ellipse cx="-12" cy="78" rx="3.5" ry="4.5" fill="#1E1B4B"/>
+    <ellipse cx="12" cy="78" rx="3.5" ry="4.5" fill="#1E1B4B"/>
+    <path d="M-15 104 Q0 115 15 104" fill="none" stroke="#78350F" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Candidate 3 - Wakil (Right Figure) -->
+  <g transform="translate(340, 105)">
+    <!-- Body / Suit -->
+    <path d="M-55 255 C-55 170 -25 145 0 145 C25 145 55 170 55 255 Z" fill="#1E293B"/>
+    <!-- Hair Ponytail / Ribbon -->
+    <path d="M-45 70 C-45 15 45 15 45 70 C45 110 35 130 30 160 C15 130 10 100 10 70 Z" fill="#1E1B4B"/>
+    <!-- Face -->
+    <circle cx="0" cy="80" r="38" fill="#FFEDD5"/>
+    <path d="M-38 65 C-38 25 38 25 38 65 C20 45 -20 45 -38 65 Z" fill="#1E1B4B"/>
+    <ellipse cx="-11" cy="78" rx="3.5" ry="4.5" fill="#0F172A"/>
+    <ellipse cx="11" cy="78" rx="3.5" ry="4.5" fill="#0F172A"/>
+    <path d="M-12 98 Q0 108 12 98" fill="none" stroke="#9A3412" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Number Badge -->
+  <g transform="translate(40, 35)">
+    <rect width="90" height="90" rx="18" fill="url(#badgeGrad3)"/>
+    <text x="45" y="40" font-family="'Outfit', 'Inter', sans-serif" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">PASLON</text>
+    <text x="45" y="78" font-family="'Outfit', 'Inter', sans-serif" font-size="38" font-weight="900" fill="#FFFFFF" text-anchor="middle">03</text>
+  </g>
+
+  <!-- Bottom Info Overlay -->
+  <rect x="0" y="325" width="600" height="75" fill="#2E1065" fill-opacity="0.9"/>
+  <text x="300" y="354" font-family="'Outfit', 'Inter', sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="middle">Dimas Arya Pangestu &amp; Clarissa Aurelia Chandra</text>
+  <text x="300" y="380" font-family="'Inter', sans-serif" font-size="13" font-weight="400" fill="#DDD6FE" text-anchor="middle">"Kreatif, Berintegritas &amp; Siap Kerja Industri 5.0"</text>
+</svg>

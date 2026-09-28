@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/tailwind.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#ecfdf5,#d1fae5);padding:2rem;">
+  <div style="max-width:540px;width:100%;text-align:center;">
+    <% if (alreadyVoted) { %>
+    <!-- Token Sudah Hangus -->
+    <div class="card" style="padding:3rem 2rem;">
+      <div style="font-size:3rem;margin-bottom:1rem;">🚫</div>
+      <h1 style="font-size:1.4rem;font-weight:800;color:var(--red-text);margin-bottom:0.75rem;">Token Sudah Hangus!</h1>
+      <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1.5rem;">
+        Hak suara untuk NISN Anda <strong>sudah digunakan</strong>. Token telah berstatus hangus secara otomatis.<br>
+        Tidak dapat melakukan pemilihan ulang (anti double-voting aktif).
+      </p>
+      <div class="alert alert-error"><span class="alert-icon">🔒</span> Sistem mencegah akses bilik suara kedua kali.</div>
+      <a href="/logout" class="btn btn-outline btn-full" style="margin-top:1rem;">Keluar dari Sistem</a>
+    </div>
+
+    <% } else { %>
+    <!-- Sukses Memilih -->
+    <div class="card" style="padding:3rem 2rem;border:2px solid var(--green-border);">
+      <div style="font-size:3.5rem;margin-bottom:1rem;animation:bounce 0.6s;">✅</div>
+      <h1 style="font-size:1.4rem;font-weight:800;color:var(--green-text);margin-bottom:0.5rem;">Suara Berhasil Dicatat!</h1>
+      <p style="color:var(--text-muted);font-size:0.87rem;margin-bottom:1.5rem;">
+        Hak suara Anda untuk <strong>Paslon Nomor Urut 0<%= nomorPaslon %></strong> telah berhasil dicatat dalam sistem E-Voting.<br>
+        Token voting Anda kini telah <strong>hangus secara otomatis</strong>.
+      </p>
+
+      <% if (voter) { %>
+      <div style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--radius-md);padding:1rem;margin-bottom:1.25rem;text-align:left;">
+        <div style="font-size:0.72rem;font-weight:800;color:var(--green-text);margin-bottom:0.5rem;text-align:center;letter-spacing:0.05em;">DATA PEMILIH</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-size:0.82rem;">
+          <div><span style="color:var(--text-muted);">Nama</span><br><strong><%= voter.nama %></strong></div>
+          <div><span style="color:var(--text-muted);">Kelas</span><br><strong><%= voter.kelas %></strong></div>
+          <div><span style="color:var(--text-muted);">NISN</span><br><strong class="font-mono"><%= voter.nisn %></strong></div>
+          <div><span style="color:var(--text-muted);">Status</span><br><span class="badge badge-green">✓ Sudah Memilih</span></div>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Kode Verifikasi Audit -->
+      <div style="background:var(--primary-light);border:1px solid var(--primary-border);border-radius:var(--radius-md);padding:1rem;margin-bottom:1.5rem;">
+        <div style="font-size:0.72rem;font-weight:800;color:var(--primary);margin-bottom:0.4rem;letter-spacing:0.05em;">KODE VERIFIKASI AUDIT SUARA</div>
+        <div class="font-mono" style="font-size:1rem;font-weight:700;color:var(--primary);letter-spacing:0.05em;word-break:break-all;">
+          <%= kodeVerifikasi %>
+        </div>
+        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:0.35rem;">
+          Simpan kode ini sebagai bukti. Kerahasiaan pilihan Anda tetap terjaga (LUBER JURDIL).
+        </div>
+      </div>
+
+      <div class="alert alert-info" style="text-align:left;margin-bottom:1.5rem;">
+        <span class="alert-icon">🔒</span>
+        <span style="font-size:0.8rem;">Sistem menjamin <strong>kerahasiaan pilihan</strong> Anda. Log audit hanya menyimpan kode anonim, bukan identitas pemilih.</span>
+      </div>
+
+      <a href="/logout" class="btn btn-success btn-full btn-lg">✅ Selesai & Keluar</a>
+    </div>
+    <% } %>
+  </div>
+</div>
+<style>
+@keyframes bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+</style>
+</body>
+</html>
